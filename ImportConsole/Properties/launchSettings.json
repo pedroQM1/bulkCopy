@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ImportConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\topvi\\Downloads\\ImportConfiguration\\ImportConfiguration.yaml"
+    }
+  }
+}
