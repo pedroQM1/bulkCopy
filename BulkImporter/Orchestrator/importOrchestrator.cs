@@ -22,14 +22,14 @@ namespace ImportManager.Orchestrator
             var bulkConfigurationYamlParse = new OrchestrationYamlfileParse();
             return new importOrchestrator(bulkConfigurationYamlParse,loggerFactory);
         }
-        public void Handler(string configurationPath)
+        public async Task Handler(string configurationPath,CancellationToken cancellationToken = default)
         {
             var configuration = _bulkConfigurationYamlParse.ParseSchemaFromFile(configurationPath);
             foreach (var importTaks in configuration.ImportTaskConfigurations)
             {
                 using (var import = ImportManagerComponent.Create(_loggerFactory, configuration.ConnectionString,importTaks))
                 {
-                    import.ImportFile(importTaks.ImportFilePath, importTaks.IgnoreImportFileHeader);
+                    await import.ImportFileAsync(importTaks.ImportFilePath, importTaks.IgnoreImportFileHeader, cancellationToken);
                 }
             }
 

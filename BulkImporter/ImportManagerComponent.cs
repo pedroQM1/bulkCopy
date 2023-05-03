@@ -45,39 +45,7 @@ public class ImportManagerComponent : IDisposable
                                     logger: loggerFactory.CreateLogger<ImportManagerComponent>()
                                  );
     }
-    public void ImportFile(string filePathCSV,bool IgnoreImportFileHeader = false)
-    {
-        _logger.LogInformation($"Read file {filePathCSV}");
-
-        try
-        {
-            using (StreamReader reader = new StreamReader(filePathCSV))
-            {
-                while (!reader.EndOfStream)
-                {
-                    if (IgnoreImportFileHeader)
-                    {
-                        var line =  reader.ReadLine();
-                    }
-                    using (var dataTable = _schemaParseFactory.Create())
-                    {
-                        for (int i = 0; i < _persiterData.BatchSize && !reader.EndOfStream; i++) dataTable.Reader(reader.ReadLine()!);
-                       _persiterData.WriteServer(dataTable.DataTable);
-                    }
-                }
-            }
-        }
-        catch (PersisterBulkDataTableException ex)
-        {
-            _logger.LogError("Error persiter data in data base using bulk insert ");
-            _logger.LogError(ex.Message, ex);
-        }
-        catch (SchemaParseLineException ex)
-        {
-            _logger.LogError("Error parsing csv line for class schema");
-            _logger.LogError(ex.Message, ex);
-        }
-    }
+  
     public async Task ImportFileAsync(string filePathCSV, bool IgnoreImportFileHeader = false,CancellationToken cancellationToken = default)
     {
         _logger.LogInformation($"Read file {filePathCSV}");

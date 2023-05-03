@@ -3,6 +3,7 @@
 
 using ImportManager.Orchestrator;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 
 var loggerFactory = LoggerFactory.Create(
@@ -16,11 +17,25 @@ var loggerFactory = LoggerFactory.Create(
        );
 
 
+
+
 var timer = new Stopwatch();
 timer.Start();
 
+var cancelationSourceToken = new CancellationTokenSource();
+var cancelationToke = cancelationSourceToken.Token;
+
+
+Console.CancelKeyPress += (ob, args) =>
+{
+    args.Cancel = true;
+    cancelationSourceToken.Cancel();
+    Console.WriteLine("Processo de importação cancelado");
+};
+Console.WriteLine("Pressione CTRL+C para cancelar...");
+
 var orchestrador = importOrchestrator.Create(loggerFactory);
-orchestrador.Handler(args[0]);
+await orchestrador.Handler(args[0], cancelationToke);
 
 timer.Stop();
 TimeSpan timeTaken = timer.Elapsed;

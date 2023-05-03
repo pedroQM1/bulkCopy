@@ -3,7 +3,6 @@ using BulkImporter.Exceptions;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading;
 
 namespace BulkImporter.Data;
 
@@ -36,26 +35,18 @@ public class BulkSqlServerData : IPersisterBulkDataTable
     }
     public async Task WriteServerAsync(DataTable dataTable,CancellationToken cancellationToken)
     {
+
+        var transaction = _dbconn.BeginTransaction();
         try
         {
             await _bulk.WriteToServerAsync(dataTable, cancellationToken);
+            transaction.Commit();
         }
         catch (Exception ex)
         {
+            transaction.Rollback();
             _logger.LogError(ex.Message,ex);
             throw new PersisterBulkDataTableException(ex.Message,ex);
-        }
-    }
-    public void WriteServer(DataTable dataTable)
-    {
-        try
-        {
-            _bulk.WriteToServer(dataTable);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message, ex);
-            throw new PersisterBulkDataTableException(ex.Message, ex);
         }
     }
    
